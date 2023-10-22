@@ -44,4 +44,4 @@ ENV QUARKUS_HTTP_HOST="0.0.0.0"
 
 CMD [ "quarkus", "dev" ]
 
-HEALTHCHECK CMD curl -f "http://localhost:8888/hello/greeting/?name=health&" || exit 1
+HEALTHCHECK CMD curl -f "http://localhost:8888/hello/greeting/Health&" || exit 1
