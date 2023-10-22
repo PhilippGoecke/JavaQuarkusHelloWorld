@@ -15,9 +15,6 @@ RUN adduser user
 USER user
 WORKDIR /home/user
 
-RUN java --version
-RUN mvn --version
-
 # https://quarkus.io/get-started/
 RUN curl -Ls https://sh.jbang.dev/ --output jbang.bash \
   && echo "9d209eafd4d163e892d338ca8719b3715b34bb3ba0ce567c0d4146b054cad195aecf15d4cb7ad909ee2c6d236075732565e5fbe06d89a24f8639df88e7dd2d58  jbang.bash" > jbang.bash.sha512 \
@@ -27,6 +24,10 @@ RUN curl -Ls https://sh.jbang.dev/ --output jbang.bash \
 
 #RUN source ~/.bashrc
 ENV PATH="/home/user/.jbang/bin:${PATH}"
+
+RUN java --version
+RUN mvn --version
+RUN quarkus version
 
 RUN quarkus create \
   && ls -lisah \
@@ -39,7 +40,7 @@ COPY GreetingResource.java ./src/main/java/org/acme/GreetingResource.java
 COPY GreetingResourceTest.java src/test/java/org/acme/GreetingResourceTest.java
 
 # Run JUnit 5 tests
-RUN ./mvnw test
+RUN ./mvnw test --fail-at-end
 
 EXPOSE 8888
 
