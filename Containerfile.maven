@@ -36,6 +36,10 @@ WORKDIR /home/user/code-with-quarkus
 
 COPY GreetingService.java ./src/main/java/org/acme/GreetingService.java
 COPY GreetingResource.java ./src/main/java/org/acme/GreetingResource.java
+COPY GreetingResourceTest.java src/test/java/org/acme/GreetingResourceTest.java
+
+# Run JUnit 5 tests
+RUN ./mvnw test
 
 EXPOSE 8888
 
