@@ -34,6 +34,7 @@ RUN quarkus create \
 
 WORKDIR /home/user/code-with-quarkus
 
+COPY GreetingService.java ./src/main/java/org/acme/GreetingService.java
 COPY GreetingResource.java ./src/main/java/org/acme/GreetingResource.java
 
 EXPOSE 8888
@@ -43,4 +44,4 @@ ENV QUARKUS_HTTP_HOST="0.0.0.0"
 
 CMD [ "quarkus", "dev" ]
 
-HEALTHCHECK CMD curl -f "http://localhost:8888/hello?name=health&" || exit 1
+HEALTHCHECK CMD curl -f "http://localhost:8888/hello/greeting/?name=health&" || exit 1
