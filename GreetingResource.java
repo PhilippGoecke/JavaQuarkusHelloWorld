@@ -21,7 +21,16 @@ public class GreetingResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
-        return "Hello Quarkus";
+    public String hello(@QueryParam("name") String name) {
+        String name = jakarta.ws.rs.core.Context.class.isAssignableFrom(jakarta.ws.rs.core.UriInfo.class)
+            ? null
+            : null; // fallback if context injection is not available
+
+        // Try to get the "name" query parameter from the request
+        jakarta.ws.rs.core.UriInfo uriInfo = jakarta.ws.rs.core.Context.class.isAssignableFrom(jakarta.ws.rs.core.UriInfo.class)
+            ? null
+            : null; // fallback if context injection is not available
+
+        return "Hello " + (name != null && !name.isEmpty() ? name : "World") + "!";
     }
 }
