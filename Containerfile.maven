@@ -1,29 +1,31 @@
-FROM debian:bookworm-slim as build-env
+FROM debian:trixie-slim as build-env
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt upgrade -y \
   # install tools
-  && apt install -y --no-install-recommends curl \
+  && apt install -y --no-install-recommends --no-install-suggests curl \
   # install quarkus dependencies
-  && apt install -y --no-install-recommends openjdk-17-jdk maven \
+  && apt install -y --no-install-recommends --no-install-suggests openjdk-21-jdk maven \
   # make image smaller
   && rm -rf "/var/lib/apt/lists/*" \
   && rm -rf /var/cache/apt/archives
 
-RUN adduser user
-USER user
-WORKDIR /home/user
+ARG USER=quarkus
+RUN useradd --create-home --shell /bin/bash $USER
+ARG HOME="/home/$USER"
+WORKDIR $HOME
+USER $USER
 
 # https://quarkus.io/get-started/
 RUN curl -Ls https://sh.jbang.dev/ --output jbang.bash \
-  && echo "7661c1e7bdccdbf89d9f969db137a7e90a372ad1865d8c58bda243eb76da8c2d81693cc9d42b2825558ef1bbb849a9c2bef1096622794a88aa63ded0e28172e2  jbang.bash" > jbang.bash.sha512 \
+  && echo "229dfd76ab1ac0753ac8eed6c81c24619c83d6a194de995910a0aa485aabd14fc8014db4216d9bababb0d68410194145ec1af8ae19b81132f178ff23ed3aed77 jbang.bash" > jbang.bash.sha512 \
   && sha512sum -c jbang.bash.sha512 \
   && cat jbang.bash | bash -s - trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/ \
   && cat jbang.bash | bash -s - app install --fresh --force quarkus@quarkusio
 
 #RUN source ~/.bashrc
-ENV PATH="/home/user/.jbang/bin:${PATH}"
+ENV PATH="/home/$USER/.jbang/bin:${PATH}"
 
 RUN java --version
 RUN mvn --version
@@ -33,7 +35,7 @@ RUN quarkus create \
   && ls -lisah \
   && cd code-with-quarkus
 
-WORKDIR /home/user/code-with-quarkus
+WORKDIR "/home/$USER/code-with-quarkus"
 
 COPY GreetingService.java ./src/main/java/org/acme/GreetingService.java
 COPY GreetingResource.java ./src/main/java/org/acme/GreetingResource.java
