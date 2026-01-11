@@ -25,7 +25,7 @@ public class GreetingResourceTest {
     public void testGreetingEndpoint() {
         String uuid = UUID.randomUUID().toString();
         given()
-          .when().get("/hello/greeting/{name}")
+          .when().get("/hello/" + uuid)
           .then()
             .statusCode(200)
             .body(startsWith("Hello " + uuid + "!"));
