@@ -44,6 +44,9 @@ COPY GreetingResourceTest.java src/test/java/org/acme/GreetingResourceTest.java
 # Run JUnit 5 tests
 RUN ./mvnw test --fail-at-end
 
+# Package the application
+RUN ./mvnw package -DskipTests
+
 EXPOSE 8888
 
 ENV QUARKUS_HTTP_PORT="8888"
@@ -54,6 +57,7 @@ ENV QUARKUS_HTTP_HOST="0.0.0.0"
 ENV QUARKUS_HTTP_CORS="true"
 ENV QUARKUS_HTTP_CORS_ORIGINS="*"
 
-CMD [ "./mvnw", "quarkus:run" ]
+CMD [ "java", "-jar", "target/quarkus-app/quarkus-run.jar" ]
+#CMD [ "./mvnw", "quarkus:run" ]
 
 HEALTHCHECK CMD curl -f "http://localhost:8888/hello/greeting/Health&" || exit 1
