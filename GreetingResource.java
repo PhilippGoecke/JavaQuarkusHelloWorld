@@ -13,7 +13,7 @@ public class GreetingResource {
     GreetingService service;
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_HTML)
     @Path("/greeting/{name}")
     public String greeting(String name) {
         return service.greeting(name);
