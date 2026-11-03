@@ -1,4 +1,4 @@
-FROM debian:trixie-slim as build-env
+FROM debian:trixie-slim AS build-env
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -9,27 +9,27 @@ RUN apt update && apt upgrade -y \
   && apt install -y --no-install-recommends --no-install-suggests openjdk-21-jdk maven \
   # make image smaller
   && rm -rf "/var/lib/apt/lists/*" \
-  && rm -rf /var/cache/apt/archives
+  && rm -rf "/var/cache/apt/archives/*"
 
 ARG USER=quarkus
-RUN useradd --create-home --shell /bin/bash $USER
+RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin "$USER"
 ARG HOME="/home/$USER"
 WORKDIR $HOME
 USER $USER
 
 # https://quarkus.io/get-started/
-RUN curl -Ls https://sh.jbang.dev/ --output jbang.bash \
-  && echo "af4ef54530e4a87299ae84059be7654e55da74f07e5571bc6e50106fc949a6a55e34e1061a72aa748f9b5b835e88ea58786ba4a25927876bde8c195944d9bd24 jbang.bash" > jbang.bash.sha512 \
-  && sha512sum -c jbang.bash.sha512 \
-  && cat jbang.bash | bash -s - trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/ \
-  && cat jbang.bash | bash -s - app install --fresh --force quarkus@quarkusio
+RUN curl --fail --location --silent --show-error https://sh.jbang.dev/ --output jbang.bash \
+  && echo "af4ef54530e4a87299ae84059be7654e55da74f07e5571bc6e50106fc949a6a55e34e1061a72aa748f9b5b835e88ea58786ba4a25927876bde8c195944d9bd24 jbang.bash" | sha512sum --strict --check - \
+  && bash jbang.bash trust add https://repo1.maven.org/maven2/io/quarkus/quarkus-cli/ \
+  && bash jbang.bash app install --fresh --force quarkus@quarkusio \
+  && rm -f jbang.bash jbang.bash.sha512
 
 #RUN source ~/.bashrc
 ENV PATH="/home/$USER/.jbang/bin:${PATH}"
 
-RUN java --version
-RUN mvn --version
-RUN quarkus version
+RUN java --version \
+  && mvn --version \
+  && quarkus version
 
 RUN quarkus create \
   && ls -lisah \
@@ -47,6 +47,18 @@ RUN mvn test --fail-at-end
 # Package the application
 RUN mvn package -DskipTests
 
+FROM debian:trixie-slim AS runtime
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt update && apt upgrade -y \
+  && apt install -y --no-install-recommends curl openjdk-21-jre-headless \
+  && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/* \
+  && useradd --create-home --uid 10001 --shell /usr/sbin/nologin quarkus
+
+WORKDIR /home/quarkus
+COPY --from=build-env --chown=10001:10001 /home/quarkus/code-with-quarkus/target/quarkus-app/ ./target/quarkus-app/
+USER 10001:10001
+
 EXPOSE 8888
 
 ENV QUARKUS_HTTP_PORT="8888"
@@ -60,4 +72,4 @@ ENV QUARKUS_HTTP_CORS_ORIGINS="*"
 CMD [ "java", "-jar", "target/quarkus-app/quarkus-run.jar" ]
 #CMD [ "./mvnw", "quarkus:run" ]
 
-HEALTHCHECK CMD curl -f "http://localhost:8888/hello/greeting/Health&" || exit 1
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 CMD curl --fail --silent "http://localhost:8888/hello/greeting/Health&" || exit 1
