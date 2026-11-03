@@ -30,6 +30,12 @@ ENV PATH="/home/$USER/.jbang/bin:${PATH}"
 RUN java --version \
   && mvn --version \
   && quarkus version
+RUN printf '\n☕ Checking Java version...\n' \
+  && java --version \
+  && printf '\n📦 Checking Maven version...\n' \
+  && mvn --version \
+  && printf '\n⚡ Checking Quarkus version...\n' \
+  && quarkus version
 
 RUN quarkus create \
   && ls -lisah \
