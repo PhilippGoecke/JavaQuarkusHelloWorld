@@ -42,10 +42,10 @@ COPY GreetingResource.java ./src/main/java/org/acme/GreetingResource.java
 COPY GreetingResourceTest.java src/test/java/org/acme/GreetingResourceTest.java
 
 # Run JUnit 5 tests
-RUN ./mvnw test --fail-at-end
+RUN mvn test --fail-at-end
 
 # Package the application
-RUN ./mvnw package -DskipTests
+RUN mvn package -DskipTests
 
 EXPOSE 8888
 
