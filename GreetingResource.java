@@ -30,6 +30,13 @@ public class GreetingResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
+        return helloPath();
+    }
+
+    @GET
+    @Path("/hello")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String helloPath() {
         return "Hello World!";
     }
 }
