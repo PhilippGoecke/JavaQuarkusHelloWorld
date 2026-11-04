@@ -3,10 +3,11 @@ package org.acme;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("/hello")
+@Path("/")
 public class GreetingResource {
 
     @Inject
@@ -14,8 +15,16 @@ public class GreetingResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Path("/greeting/{name}")
+    @Path("/hello/greeting/{name}")
     public String greeting(String name) {
+        return service.greeting(name);
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_HTML)
+    @Path("/hello/parameter/{name}")
+    @Path("/hello/parameter")
+    public String parameter(@QueryParam("name") String name) {
         return service.greeting(name);
     }
 
