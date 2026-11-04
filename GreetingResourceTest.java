@@ -32,4 +32,15 @@ public class GreetingResourceTest {
             .body(startsWith("Hello " + uuid + "!"));
     }
 
+    @Test
+    public void testGreetingParameterEndpoint() {
+        String uuid = UUID.randomUUID().toString();
+        given()
+          .queryParam("name", uuid)
+          .when().get("/hello/parameter")
+          .then()
+            .statusCode(200)
+            .body(startsWith("Hello " + uuid + "!"));
+    }
+
 }
