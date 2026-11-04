@@ -22,7 +22,6 @@ public class GreetingResource {
 
     @GET
     @Produces(MediaType.TEXT_HTML)
-    @Path("/hello/parameter/{name}")
     @Path("/hello/parameter")
     public String parameter(@QueryParam("name") String name) {
         return service.greeting(name);
